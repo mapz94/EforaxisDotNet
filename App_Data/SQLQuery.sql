@@ -41,7 +41,7 @@ CREATE TABLE Users (
 CREATE TABLE Orders (
   OrderID int NOT NULL PRIMARY KEY IDENTITY(1, 1),
   UserID int NOT NULL FOREIGN KEY REFERENCES Users(UserID) DEFAULT 1,
-  OrderAddress nvarchar(255) UNIQUE NOT NULL,
+  OrderAddress nvarchar(255) NOT NULL,
   OrderCommune nvarchar(255) NOT NULL,
   OrderRegion nvarchar(255) NOT NULL,
   SubTotal float NOT NULL DEFAULT 0,
