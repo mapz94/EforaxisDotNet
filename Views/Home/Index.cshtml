@@ -1,0 +1,67 @@
+﻿@using EforaxisDotNet.Helpers
+@{
+    ViewBag.Title = "Inicio";
+
+}
+
+<div class="jumbotron">
+    <h1>Eforaxis</h1>
+    <p class="lead">
+        Eforaxis es un ecommerce el cual vende por internet los productos de
+        las Pymes pertenecientes a la localidad; Productos como artesanía, vestuario,
+        tecnología, artículos del hogar, entre otros.
+    </p>
+</div>
+
+<div class="row">
+    @foreach (EforaxisDotNet.Product product in (IEnumerable<EforaxisDotNet.Product>)ViewData["products"])
+    {
+        IEnumerable<CartItem> cartItems = new CartHelper().GetCurrentCartItems(Session);
+        bool isInCart = false;
+        foreach(CartItem item in cartItems)
+        {
+            if(item.ProductID == product.ProductsID)
+            {
+                isInCart = true;
+                break;
+            }
+        }
+        <form action="/Home/Cart" method="post" class="col-sm-4 thumbnail px-2">
+            <div>
+                <img style="width:100%" src="@Html.DisplayFor(modelItem => product.FeaturedImage)" alt="Product Image" />
+            </div>
+            <div>
+                <input hidden type="number" readonly name="ProductID" value="@Html.DisplayFor(modelItem => product.ProductsID)" />
+                <h4 class="card-title">
+                    @Html.DisplayFor(modelItem => product.ProductName)
+                </h4>
+                <h6 class="card-subtitile">
+                    <label>
+                        @Html.DisplayFor(modelItem => product.Pyme.PymeName)
+                    </label>
+                </h6>
+                <h6 class="card-subtitile text-muted">
+                    <label>
+                        @Html.DisplayFor(modelItem => product.ProductType1.TypeName)
+                    </label>
+                </h6>
+                @if (isInCart)
+                {
+                    <button disabled class="btn btn-success btn-block mb-2">
+                        Producto en carro.
+                    </button>
+                }
+                else
+                {
+                    <input type="text" name="action" value="update" readonly hidden />
+                    <input type="number" name="quantity" value="1" readonly hidden />
+                    <button type="submit" class="btn btn-primary btn-block mb-2">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        Agregar al carro.
+                    </button>
+                }
+            </div>
+        </form>
+    }
+</div>
+

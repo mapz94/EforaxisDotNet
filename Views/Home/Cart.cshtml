@@ -1,0 +1,212 @@
+﻿@using EforaxisDotNet.Helpers
+@using System.Globalization;
+
+
+@{
+    ViewData["Total"] = 0.0f;
+    ViewData["Discounts"] = 0.0f;
+    ViewData["SubTotal"] = 0.0f;
+}
+
+
+<div>
+    <table class="table">
+        <tr>
+            <th>
+                ID Producto
+            </th>
+            <th>
+                Nombre Producto
+            </th>
+            <th>
+                Precio
+            </th>
+            <th>
+                Cantidad
+            </th>
+            <th>
+                SubTotal
+            </th>
+            <th>
+                Descuento
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                Acciones
+            </th>
+        </tr>
+        @foreach (CartItem cartItem in (IEnumerable<CartItem>)ViewData["CartItems"])
+        {
+
+            EforaxisDotNet.Product product = new DataAccessLayer().GetProduct(cartItem.ProductID);
+            float total = (float)ViewData["Total"];
+            total += (cartItem.Quantity * (float)product.Price) - (float)product.Discount * (float)product.Price * cartItem.Quantity;
+            ViewData["Total"] = total;
+
+            float discounts = (float)ViewData["Discounts"];
+            discounts += cartItem.Quantity * (float)product.Price * (float)product.Discount;
+            ViewData["Discounts"] = discounts;
+
+            float subtotal = (float)ViewData["SubTotal"];
+            subtotal += cartItem.Quantity * (float)product.Price;
+            ViewData["SubTotal"] = subtotal;
+            <tr>
+                <td>
+                    @cartItem.ProductID
+                </td>
+                <td>
+                    @product.ProductName
+                </td>
+                <td>
+                    @product.Price
+                </td>
+                <td>
+                    <form action="/Home/Cart" method="post">
+                        <input readonly hidden type="number" name="productID" value="@product.ProductsID" />
+                        <input readonly hidden type="text" name="action" value="increasedecrease" />
+                        <input class="inputQuantity" type="number" min="1" max="99" name="quantity" value="@cartItem.Quantity" />
+                    </form>
+                </td>
+                <td>
+                    @((cartItem.Quantity * product.Price))
+<td>
+                    @(product.Discount*100)%
+                </td>
+                <td>
+                    @((cartItem.Quantity * product.Price)- product.Discount * product.Price * cartItem.Quantity)
+                </td>
+                <td>
+                    <form action="/Home/Cart" method="post">
+                        <input readonly hidden type="number" name="ProductID" value="@product.ProductsID" />
+                        <input readonly hidden type="text" name="Action" value="delete" />
+                        <button type="submit">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td colspan="4">
+                <h4>
+                    SubTotal: @(((float)ViewData["SubTotal"]).ToString("C", CultureInfo.CreateSpecificCulture("es-CL")))
+                </h4>
+                <h4>
+                    Descuentos:- @(((float)ViewData["Discounts"]).ToString("C", CultureInfo.CreateSpecificCulture("es-CL")))
+                </h4>
+                <h4>
+                    Total: @(((float)ViewData["Total"]).ToString("C", CultureInfo.CreateSpecificCulture("es-CL")))
+                </h4>
+            </td>
+        </tr>
+    </table>
+
+</div>
+<div>
+    <h2>
+        Checkout
+    </h2>
+    <form action="/Home/Checkout" method="post">
+        <input hidden readonly type="number" name="UserID" value="1" />
+        <input hidden readonly type="text" name="action" value="checkout" />
+        <div class="form-group">
+            <label for="inputAddress">
+                Dirección
+            </label>
+            <input required type="text" class="form-control" name="OrderAddress" id="inputAddress" value="" />
+        </div>
+        <div class="form-group">
+            <label for="address">
+                Región
+            </label>
+            <select required class="form-control" id="selectRegion" name="OrderRegion">
+                <option selected disabled value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="address">
+                Comuna
+            </label>
+            <select disabled required class="form-control" id="selectComuna" name="OrderCommune">
+                <option selected disabled value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="radioPayment">
+                Tipo de Pago:
+            </label>
+            <fieldset id="paymentTypesGroup">
+                <input type="radio" name="PaymentType" id="payment0" value="0" required />
+                <label for="payment0">Débito</label>
+                <input type="radio" name="PaymentType" id="payment1" value="1" />
+                <label for="payment0">Crédito</label>
+            </fieldset>
+        </div>
+        <input hidden readonly type="number" name="SubTotal" value="@ViewData["SubTotal"]" />
+        <input readonly hidden type="number" name="Tax" value="0" />
+        <input readonly hidden type="number" name="Discount" value="@ViewData["Discounts"]" />
+        <input readonly hidden type="number" name="Total" value="@ViewData["Total"]" />
+        <input readonly hidden type="number" name="OrderState" value="0" />
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+                Pagar
+            </button>
+        </div>
+
+    </form>
+</div>
+<script>
+    var selectComuna = document.getElementById("selectComuna");
+    var selectRegion = document.getElementById("selectRegion");
+    // Origen: github: miguel-apg
+    var regiones_url = "https://raw.githubusercontent.com/miguel-apg/Regiones/main/regiones.json";
+    var regiones = [];
+
+    var quantityInputs = document.getElementsByClassName("inputQuantity");
+    for (input of quantityInputs) {
+        input.addEventListener("change", (e) => {
+            // Submit
+            let parentForm = e.target.parentNode;
+            //console.log(parentForm);
+            parentForm.submit();
+        })
+    }
+
+    function fillSelects(regiones = []) {
+        regiones.forEach((region, i) => {
+            let option = document.createElement("OPTION");
+            option.value = region.name;
+            option.innerText = region.name;
+            selectRegion.appendChild(option);
+
+        })
+    }
+
+    fetch(regiones_url).then((response) => {
+        response.json().then((body) => {
+            regiones = body;
+            fillSelects(regiones);
+        }).catch(e => console.log(e));
+    });
+
+    selectRegion.addEventListener("change", e => {
+        selectComuna.innerHTML = "";
+        let regionName = e.target.value;
+        let region = regiones.find(r => r.name == regionName);
+        if (region) {
+            let comunas = region.communes;
+            comunas.forEach((comuna) => {
+                let option = document.createElement("OPTION");
+                option.value = comuna.name;
+                option.innerText = comuna.name;
+                selectComuna.append(option);
+            })
+            selectComuna.disabled = false;
+        } else {
+            selectComuna.disabled = true;
+        }
+    })
+
+</script>

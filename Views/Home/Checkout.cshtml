@@ -1,0 +1,151 @@
+﻿
+
+<div class="row">
+    <table class="table">
+        @{
+            Order order = (Order)ViewData["order"];
+            <tr>
+                <th>
+                    Detalle Orden
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    ID Orden: @order.OrderID
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Dirección: @order.OrderAddress
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Comuna: @order.OrderCommune
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Región: @order.OrderRegion
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    SubTotal: @order.SubTotal
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Descuentos: @order.Discount
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Total: @order.Total
+                </td>
+            </tr><tr>
+                     <td>
+                         Estado de Ordén: @{
+                             switch (order.OrderState)
+                             {
+                                 case 0:
+                                     <span>
+                                         En almacén
+                                     </span>
+                                     break;
+                                 case 1:
+                                     <span>
+                                         En tránsito
+                                     </span>
+                                     break;
+                                 case 2:
+                                     <span>
+                                         Entregado
+                                     </span>
+                                     break;
+                             }
+                         }
+                     </td>
+            </tr>
+                 <tr>
+                     <td>
+                         Estado de Ordén: @{
+                             switch (order.PaymentType)
+                             {
+                                 case 0:
+                                     <span>
+                                         Débito
+                                     </span>
+                                     break;
+                                 case 1:
+                                     <span>
+                                         Crédito
+                                     </span>
+                                     break;
+                             }
+                         }
+                     </td>
+                 </tr>
+
+        }
+    </table>
+    <table class="table">
+        <tr>
+            <th>
+                ID Producto
+            </th>
+            <th>
+                Nombre Producto
+            </th>
+            <th>
+                Precio
+            </th>
+            <th>
+                Cantidad
+            </th>
+            <th>
+                SubTotal
+            </th>
+            <th>
+                Descuento
+            </th>
+            <th>
+                Total
+            </th>
+        </tr>
+        @foreach (OrderDetail item in (List<OrderDetail>)ViewData["OrderDetails"])
+        {
+
+            EforaxisDotNet.Product product = new DataAccessLayer().GetProduct(item.ProductID);
+            <tr>
+                <td>
+                    @item.ProductID
+                </td>
+                <td>
+                    @product.ProductName
+                </td>
+                <td>
+                    @product.Price
+                </td>
+                <td>
+                    @item.Quantity
+                </td>
+                <td>
+                    @item.SubTotal
+                <td>
+                    @(item.Discount*100)%
+                </td>
+                <td>
+                    @item.Total
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+<div class="row">
+    <div class="col">
+        <form action="/" method="post">
+            <button type="submit" class="btn btn-primary">Volver</button>
+        </form>
+    </div>
+</div>

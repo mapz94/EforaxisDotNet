@@ -1,0 +1,119 @@
+﻿@model IEnumerable<EforaxisDotNet.Order>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderAddress)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderCommune)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderRegion)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SubTotal)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Tax)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Discount)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Total)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderState)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PaymentType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.User.UserEmail)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderAddress)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderCommune)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderRegion)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SubTotal)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Tax)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Discount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Total)
+        </td>
+        <td>
+            @{
+                switch (item.OrderState)
+                {
+                    case 0:
+                        <span>
+                            En almacén
+                        </span>
+                        break;
+                    case 1:
+                        <span>
+                            En tránsito
+                        </span>
+                        break;
+                    case 2:
+                        <span>
+                            Entregado
+                        </span>
+                        break;
+                }
+            }
+        </td>
+        <td>
+            @switch (item.PaymentType)
+            {
+            case 0:
+            <span>
+                Débito
+            </span>
+            break;
+            case 1:
+            <span>
+                Crédito
+            </span>
+            break;
+            }
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User.UserEmail)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.OrderID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.OrderID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.OrderID })
+        </td>
+    </tr>
+}
+
+</table>
